@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <span th:text="'Логи ' + ${recordCount} + ' шт.'">Логи</span>
+            </div>
+
+            <div class="mt-2 mb-2">
+                <div class="p-2">
+                    <!--Filter form-->
+                    <form class="filter-form" action="/admin/log" method="get">
+                        <input type="hidden" name="currentPage" th:value="${currentPage}" class="current-page"/>
+                        <div class="form-group">
+                            <label for="query">Поиск</label>
+                            <input type="text" name="query" class="form-control form-control-sm" id="query" th:value="${query}" placeholder="Введите текст для поиска...">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Событие</th>
+                            <th>Значение</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="logItem: ${logItems}" >
+                            <td th:text="${logItem.time}"></td>
+                            <td th:text="${logItem.tag}"></td>
+                            <td th:text="${logItem.value}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!--Pagination-->
+                <div th:if="${pageCount > 1}" class="row mt-2">
+                    <div class="col-12">
+                        <div th:style="'display:' + (${currentPage > minPage} ? 'inline-block' : 'none')" class="btn btn-sm btn-outline-secondary pagination-prev-button">&lt;&lt; Предыдущая страница</div>
+                        <span th:text="'Страница ' + ${currentPage + 1} + ' из ' + ${pageCount}">Страница 1 из 5</span>
+                        <div th:if="${currentPage &lt; maxPage}" class="btn btn-sm btn-outline-secondary pagination-next-button">Следующая страница &gt;&gt;</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+</div>
+
+<script>
+    $('#query').keypress(function(e) {
+        if(e.which == 13) {
+            bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+            $('.filter-form').submit();
+        }
+    });
+
+    //Pagination
+    $('.pagination-next-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage + 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+
+        form.submit();
+    });
+
+    $('.pagination-prev-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage - 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+        form.submit();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+
+<body>
+
+<div class="container">
+
+    <form th:action="@{/registration}" method="post">
+        <div class="card mr-auto ml-auto mt-3" style="max-width: 600px">
+            <div class="card-header">Регистрация</div>
+
+            <div class="m-2 p-2 rounded bg-danger" th:if="${error}">
+                <h4 th:text="${error}">Неправильный логин или пароль</h4>
+            </div>
+
+            <div class="m-2 p-2 rounded bg-success" th:if="${success}">
+                <h4 th:text="${success}">Регистрация успешна</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="username">Email (ваш логин)</label>
+                    <input type="email" id="username" role="username" name="email"
+                           class="form-control form-control-sm"/>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" role="password" name="password" id="password"
+                           class="form-control form-control-sm" placeholder="Минимум 5 знаков"/>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="name">Ваше имя</label>
+                    <input type="text" role="name" id="name" name="name" class="form-control form-control-sm"/>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="lastName">Фамилия</label>
+                    <input type="text" role="lastName" name="lastName" id="lastName"
+                           class="form-control form-control-sm"/>
+                </div>
+
+                <p class="card-text">Введите токен для регистрации</p>
+
+
+                <div class="form-group">
+                    <input type="hidden" name="antibotNumber" th:value="${antibotNumber}"/>
+                    <input type="text" name="antibotAnswer" class="form-control form-control-sm"/>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary float-right">Зарегистрироваться</button>
+
+                <a href="/login" class="btn btn-sm btn-outline-primary">Войти</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--End form-->
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card mt-2">
+                <div class="card-header">Настройки реферальной системы - <span th:text="${recordCount}"></span> шт.
+                    <a class="btn btn-sm btn-primary" href="/admin/tguser/referral-setting/create-update">
+                        <i class="fa fa-plus"></i> Создать настройку
+                    </a>
+                </div>
+                <div class="card-body">
+                    
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Исходный тег</th>
+                                <th>Целевой тег</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="referralSetting: ${referralSettings}">
+                                <td th:text="${referralSetting.sourceTag}"></td>
+                                <td th:text="${referralSetting.targetTag}"></td>
+                                <td>
+
+                                    <div class="btn-group dropleft">
+                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Действия
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item bg-primary" th:href="'/admin/tguser/referral-setting/create-update?id=' + ${referralSetting.id}" title="Редактировать">
+                                                <i class="fa fa-edit"></i> Редактировать
+                                            </a>
+
+                                            <a class="dropdown-item bg-danger" th:href="'/admin/tguser/referral-setting/delete?id=' + ${referralSetting.id}" title="Удалить">
+                                                <i class="fa fa-trash"></i> Удалить
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!--Pagination-->
+                    <div th:if="${pageCount > 1}" class="row mt-2">
+                        <div class="col-12">
+                            <div th:style="'display:' + (${currentPage > minPage} ? 'inline-block' : 'none')" class="btn btn-sm btn-outline-secondary pagination-prev-button">&lt;&lt; Предыдущая страница</div>
+                            <span th:text="'Страница ' + ${currentPage + 1} + ' из ' + ${pageCount}">Страница 1 из 5</span>
+                            <div th:if="${currentPage &lt; maxPage}" class="btn btn-sm btn-outline-secondary pagination-next-button">Следующая страница &gt;&gt;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Pagination
+    $('.pagination-next-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage + 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+
+        form.submit();
+    });
+
+    $('.pagination-prev-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage - 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+        form.submit();
+    });
+</script>
+
+</body>
+</html>

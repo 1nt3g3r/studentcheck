@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head th:replace="fragments/header::head"></head>
+<body>
+<style>
+    .stat-item-text {
+        font-weight: 700;
+    }
+</style>
+
+    <!--TOP MENU-->
+    <th:block th:replace="fragments/header::top-menu"></th:block>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6">
+                <!--Timing-->
+                <div class="card">
+                    <div class="card-header">Запросов за время</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <span>Запросов за секунду: </span> <span class="stat-item-text" th:text="${stats.getRequestPerTime(1)}"></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Запросов за минуту: </span> <span class="stat-item-text" th:text="${#numbers.formatInteger(stats.getRequestPerTime(60), 0)}"></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Запросов за час: </span> <span class="stat-item-text" th:text="${#numbers.formatInteger(stats.getRequestPerTime(3600), 0)}"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <!--By tasks-->
+                <div class="card">
+                    <div class="card-header">Запросов по типам задач</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <span>Проверок HTML и CSS: </span> <span class="stat-item-text" th:text="${(stats.getPrefixRequestCount('html') + stats.getPrefixRequestCount('css') ) * stats.getTotalRequestCount() / 200} + '%'"></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Проверок JS: </span> <span class="stat-item-text" th:text="${stats.getPrefixRequestCount('js') * stats.getTotalRequestCount() / 200} + '%'"></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Проверок Java: </span> <span class="stat-item-text" th:text="${stats.getPrefixRequestCount('java') * stats.getTotalRequestCount() / 200} + '%'"></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Проверок Python: </span> <span class="stat-item-text" th:text="${stats.getPrefixRequestCount('python') * stats.getTotalRequestCount() / 200} + '%'"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">График нагрузки</div>
+
+                    <div class="card-body">
+                        <!--Setup chart -->
+                        <div class="p-2 bg-light">
+                            <div class="row" style="align-items: flex-end;">
+                                <div class="col-3">
+                                    <label for="from">Стартовая дата</label>
+                                    <input type="date" name="from" id="from" class="form-control form-control-sm">
+                                </div>
+
+                                <div class="col-3">
+                                    <label for="to">Финальная дата</label>
+                                    <input type="date" name="to" id="to" class="form-control form-control-sm">
+                                </div>
+
+                                <div class="col-3">
+                                    <label for="aggregateRpsType">Агрегировать по</label>
+                                    <select name="aggregateRpsType" id="aggregateRpsType" class="form-control form-control-sm">
+                                        <option th:each="type: ${aggregateRpsTypes}" th:text="${type.description}" th:value="${type.name()}">
+
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-sm btn-primary btn-block build-chart-button">
+                                        Построить график
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Chart -->
+                        <div style="width: 100%; height: 400px;">
+                            <div class="chart-container" style="position: relative; height:100%; width:100%">
+                                <canvas id="loadChart"></canvas>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+<script>
+    var ctx = document.getElementById('loadChart').getContext('2d');
+
+    var data = {
+        labels: [],
+        datasets: [{
+            label: "Запросов в секунду",
+            data: [],
+        }]
+    };
+
+    var chartOptions = {
+        maintainAspectRatio: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        },
+        legend: {
+            display: true,
+            position: 'top',
+            labels: {
+                boxWidth: 20,
+                fontColor: 'black'
+            }
+        }
+    };
+
+    var loadChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: chartOptions
+    });
+
+    //Setup initial data
+    var today = new Date().toISOString().substr(0, 10);
+    document.querySelector('#from').value = today;
+    document.querySelector('#to').value = today;
+
+    //Setup rebuild chart button
+    $('.build-chart-button').click((e) => {
+       const fromDate = $('#from').val();
+       const toDate = $('#to').val();
+       const aggregateRpsType = $('#aggregateRpsType').val();
+
+       //Show wait dialog
+        bootbox.dialog({message: 'Строим график...', closeButton: false});
+
+        $.get("/admin/task/requestStat/getRecords", {from: fromDate, to: toDate, aggregateRpsType: aggregateRpsType})
+            .done(function (data) {
+
+                buildChart(data);
+
+                setTimeout(() => {
+                    bootbox.hideAll();
+                }, 1000);
+            });
+    });
+
+    function buildChart(data) {
+        var chartData = {
+            labels: data.labels,
+            datasets: [{
+                label: "Запросов в секунду",
+                backgroundColor: "rgba(0,200,0,1)",
+                fillColor: "rgba(0,200,0,1)",
+                strokeColor: "rgba(0,200,0,1)",
+                data: data.values,
+            }]
+        };
+
+        loadChart.destroy();
+        loadChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: chartOptions
+        });
+    }
+</script>
+</body>
+</html>

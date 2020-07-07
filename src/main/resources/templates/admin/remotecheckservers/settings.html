@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container">
+    <form method="post" action="/admin/remotecheckservers/settings">
+        <div class="card">
+            <div class="card-header">Интеграция с серверами автопроверки</div>
+
+            <div class="card-body">
+                <div class="p-2 bg-light border rounded">
+                    <p th:text="'Задачи, ожидающие кеширования: ' + ${loadCacheQueueSize}"></p>
+                </div>
+
+                <div class="p-2 mt-2 bg-light border rounded">
+                    <h2>HTML+CSS</h2>
+
+                    <div class="form-group">
+                        <label for="remoteHtmlCssCheckServerConfigs">Сервера в формате: host:port;token
+                            <a href="/admin/remotecheckservers/invalidateCache?prefix=html" class="btn btn-sm btn-outline-primary reload-page-button">
+                                <i class="fa fa-refresh"></i> Сбросить кеш
+                            </a>
+                        </label>
+                        <textarea id="remoteHtmlCssCheckServerConfigs" name="remoteHtmlCssCheckServerConfigs" th:text="${remoteHtmlCssCheckServerConfigs}" class="form-control form-control-sm" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="p-2 mt-2 bg-light border rounded">
+                    <h2>JavaScript</h2>
+
+                    <div class="form-group">
+                        <label for="remoteJsCheckServerConfigs">Сервера в формате: host:port;token
+                            <a href="/admin/remotecheckservers/invalidateCache?prefix=js" class="btn btn-sm btn-outline-primary reload-page-button">
+                            <i class="fa fa-refresh"></i> Сбросить кеш
+                        </a>
+                        </label>
+                        <textarea id="remoteJsCheckServerConfigs" name="remoteJsCheckServerConfigs" th:text="${remoteJsCheckServerConfigs}" class="form-control form-control-sm" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="p-2 mt-2 bg-light border rounded">
+                    <h2>Java</h2>
+
+                    <div class="form-group">
+                        <label for="remoteJavaCheckServerConfigs">Сервера в формате: host:port;token
+                            <a href="/admin/remotecheckservers/invalidateCache?prefix=java" class="btn btn-sm btn-outline-primary reload-page-button">
+                                <i class="fa fa-refresh"></i> Сбросить кеш
+                            </a>
+                        </label>
+                        <textarea id="remoteJavaCheckServerConfigs" name="remoteJavaCheckServerConfigs" th:text="${remoteJavaCheckServerConfigs}" class="form-control form-control-sm" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="p-2 mt-2 bg-light border rounded">
+                    <h2>Python</h2>
+
+                    <div class="form-group">
+                        <label for="remotePythonCheckServerConfigs">Сервера в формате: host:port;token
+                            <a href="/admin/remotecheckservers/invalidateCache?prefix=python" class="btn btn-sm btn-outline-primary reload-page-button">
+                                <i class="fa fa-refresh"></i> Сбросить кеш
+                            </a>
+                        </label>
+                        <textarea id="remotePythonCheckServerConfigs" name="remotePythonCheckServerConfigs" th:text="${remotePythonCheckServerConfigs}" class="form-control form-control-sm" rows="3"></textarea>
+                    </div>
+                </div>
+
+                
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary reload-page-button">
+                    <i class="fa fa-save"></i> Сохранить
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $('.reload-page-button').click(function(e) {
+        bootbox.dialog({message: 'Сохраняем данные...', closeButton: false});
+    });
+</script>
+
+</body>
+</html>

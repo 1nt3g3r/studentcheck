@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container">
+    <form method="post" action="/admin/leeloo/settings">
+        <div class="card">
+            <div class="card-header">Интеграция с Leeloo.ai</div>
+
+            <div class="p-2 border" style="background: #95999c;">
+                <div class="row">
+                    <div class="col-2">
+                        Подписчиков: <span th:text="${leelooSubscriberCount}"></span>
+                    </div>
+
+                    <div class="col-5">
+                        Очередь API задач: <span th:text="${leelooTaskCount}"></span> ( <span th:text="${minutesToFinishTasks}"></span> минут)
+                    </div>
+
+                    <div class="col-5">
+                        Очередь ShortLink задач, шт: <span th:text="${leelooShortLinkTaskCount}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="leelooAuthToken">API Auth token</label>
+                    <input type="text" name="leelooAuthToken" id="leelooAuthToken" th:value="${leelooAuthToken}" class="form form-control form-control-sm">
+                </div>
+
+                <div class="form-group">
+                    <label for="leelooTunnelNames">Имена туннелей</label>
+                    <textarea id= "leelooTunnelNames" name="leelooTunnelNames" th:text="${leelooTunnelNames}" class="form-control form-control-sm" rows="5"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="dailyUpdateServiceUpdateEnabled" name="dailyUpdateServiceUpdateEnabled" th:checked="${dailyUpdateServiceUpdateEnabled}">
+                            <label class="form-check-label" for="dailyUpdateServiceUpdateEnabled">Рассылка включена</label>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="leelooDontSendMessages" name="leelooDontSendMessages" th:checked="${leelooDontSendMessages}">
+                            <label class="form-check-label" for="leelooDontSendMessages">Имитировать рассылку</label>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="dailyUpdateServiceUpdateHour">Время рассылки (24-х часовой формат)</label>
+                            <input type="number" min="0" max="24" id="dailyUpdateServiceUpdateHour" name="dailyUpdateServiceUpdateHour" th:value="${dailyUpdateServiceUpdateHour}" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="taskBlockServiceFrontendUrlPref">Frontend URL для блочной рассылки</label>
+                    <input type="text" name="taskBlockServiceFrontendUrlPref" id="taskBlockServiceFrontendUrlPref" th:value="${taskBlockServiceFrontendUrlPref}" class="form form-control form-control-sm">
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="useLongLinksForTasks" name="useLongLinksForTasks" th:checked="${useLongLinksForTasks}">
+                    <label class="form-check-label" for="useLongLinksForTasks">Использовать длинные ссылки</label>
+                </div>
+                
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary save-button">
+                    <i class="fa fa-save"></i> Сохранить
+                </button>
+
+                <a href="/admin/leeloo/invokeLeelooHourlyUpdate" class="btn btn-outline-primary ml-1">
+                    <i class="fa fa-refresh"></i> Обновить подписчиков в Leeloo
+                </a>
+
+                <a href="/admin/leeloo/invokeDailyUpdate" class="btn btn-outline-primary ml-1">
+                    <i class="fa fa-refresh"></i> Запустить ежедневную рассылку
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $('.save-button').click(function(e) {
+        bootbox.dialog({message: 'Сохраняем данные...', closeButton: false});
+    });
+</script>
+
+</body>
+</html>

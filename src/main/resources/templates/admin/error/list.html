@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container">
+        <div class="card">
+            <div class="card-header" th:text="'Ошибки: ' + ${errors.size()} + 'шт.'">Ошибки</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr th:each="error : ${errors}">
+                            <td th:text="${error}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer">
+                <a class="btn btn-primary btn-sm clear-button" href="/admin/error/clear">Сбросить ошибки</a>
+            </div>
+
+        </div>
+</div>
+
+<script>
+    $('.clear-button').click(function(e) {
+        bootbox.dialog({message: 'Очищаем ошибки...', closeButton: false});
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<style>
+    .list-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .list-container * {
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+        position: static;
+    }
+
+    .list-container > * {
+        padding: 3px;
+        margin: 3px;
+        user-select: none;
+        border-radius: 3px;
+    }
+
+    .list-container > *:hover {
+        background: lightgray;
+    }
+
+    .additional-options {
+        background: lightgray;
+        padding: 5px;
+        border-radius: 2px;
+    }
+
+    .additional-options section {
+        background: white;
+    }
+
+    #editor {
+        min-height: 250px;
+        height: 250px;
+        padding: 10px;
+    }
+
+</style>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid mt-3">
+    <form method="get" action="/admin/tguser/stat/createReport" class="create-report-form">
+        <div class="row mt-2">
+            <div class="col-12">
+                <details class="mt-2 additional-options">
+                    <summary>Дополнительные опции (нажмите, чтобы развернуть)</summary>
+
+                    <section class="p-2">
+                        <label for="editor">Введите программу для вычисления поля</label>
+                        <div id="editor"></div>
+<!--                        <textarea class="form-control form-control-sm calculated-field-text" name="calculatedField" rows="10" id="editor"></textarea>-->
+                    </section>
+                </details>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <!--Predefined-->
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-header">Выберите пресет, или же настройте вручную детали</div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-block automarathon-button">Автомарафон</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-block resume51-button">Самостоятельный продукт на сайте GoIT</button>
+
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-block teen33-html-css-js-button">Teen33 - HTML+CSS+JS</button>
+
+
+                    </div>
+
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            Сформировать отчет
+                        </button>
+                        <button type="button" class="btn btn-outline-primary export-csv-button btn-sm ml-2">
+                            <i class="fa fa-download"></i> Выгрузить в CSV
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!--Tags-->
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-header">Выберите теги</div>
+                    <div class="card-body">
+                        <div class="list-container">
+                            <div class="form-check mt-2 mb-2 user-tags-group" th:each="userTag:${userTags}">
+                                <input name="filterTags" class="form-check-input" type="checkbox" th:value="${userTag}"
+                                       th:id="${userTag}">
+                                <label class="form-check-label" th:for="${userTag}" th:text="${userTag}">
+                                    Tag
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Dates-->
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-header">Выберите даты</div>
+                    <div class="card-body">
+                        <div class="list-container">
+                            <div class="form-check event-dates-group" th:each="userEventDate:${userEventDates}">
+                                <input name="filterDates" class="form-check-input" type="checkbox" th:value="${userEventDate}"
+                                       th:id="${userEventDate}">
+                                <label class="form-check-label" th:for="${userEventDate}" th:text="${userEventDate}">
+                                    Date
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Blocks-->
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-header">Выберите блоки</div>
+                    <div class="card-body">
+                        <div class="list-container">
+                            <div class="form-check block-group" th:each="blockId:${allBlockIds}">
+                                <input name="filterBlockIds" class="form-check-input" type="checkbox" th:value="${blockId}"
+                                       th:id="'block' + ${blockId}">
+                                <label class="form-check-label" th:for="'block' + ${blockId}" th:text="${blockId}">
+                                    Date
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<form class="export-csv-form" method="post" action="/admin/tguser/stat/exportCsv">
+    <input type="hidden" name="filterTags" class="filter-tags">
+    <input type="hidden" name="filterDates" class="filter-dates">
+    <input type="hidden" name="filterBlockIds" class="filter-block-ids">
+    <input type="hidden" name="calculatedField" class="calculated-field-input">
+</form>
+
+<script>
+    //Init editor
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/eclipse");
+    editor.setFontSize("14px");
+    editor.session.setMode("ace/mode/groovy");
+
+    $('.export-csv-button').click((e) => {
+        const tagsValues = getCheckboxValues($(".user-tags-group input[type='checkbox']"));
+        const dateValues = getCheckboxValues($(".event-dates-group input[type='checkbox']"));
+        const blockValues = getCheckboxValues($(".block-group input[type='checkbox']"));
+
+        const tags = tagsValues.join(",");
+        const dates = dateValues.join(",");
+        const blocks = blockValues.join(",").split("block").join("");
+        const calculatedFieldValue = editor.getValue();
+        //$('.calculated-field-text').val();
+
+        $('.export-csv-form .filter-tags').val(tags);
+        $('.export-csv-form .filter-dates').val(dates);
+        $('.export-csv-form .filter-block-ids').val(blocks);
+        $('.export-csv-form .calculated-field-input').val(calculatedFieldValue);
+
+        $('.export-csv-form').submit();
+    });
+
+    $('.resume51-button').click(function(e) {
+        selectTags(['RESUME51']);
+        selectBlocks(['block0']);
+    });
+
+    $('.automarathon-button').click(function(e) {
+        selectTags(['MARATHON5']);
+        selectBlocks(['block1', 'block2', 'block3', 'block4', 'block5', 'block6']);
+    });
+
+    $('.teen33-html-css-js-button').click(function(e) {
+        selectTags(['TEEN33']);
+        selectBlocks(['block8', 'block9', 'block10']);
+    });
+
+    function selectBlocks(blocks) {
+        selectCheckboxes($(".block-group input[type='checkbox']"), blocks);
+    }
+
+    function selectDates(dates) {
+        selectCheckboxes($(".event-dates-group input[type='checkbox']"), dates);
+    }
+
+    function selectTags(tags) {
+        selectCheckboxes($(".user-tags-group input[type='checkbox']"), tags);
+    }
+
+    function selectCheckboxes(selector, values) {
+        $(selector).each(function(index, element) {
+            const id = element.id;
+            element.checked = $.inArray(id, values) >= 0;
+        });
+    }
+
+    function getCheckboxValues(selector) {
+        let result = [];
+        $(selector).each(function(index, element) {
+            const id = element.id;
+            if (element.checked) {
+                result.push(id);
+            }
+        });
+        return result;
+    }
+</script>
+
+</body>
+</html>

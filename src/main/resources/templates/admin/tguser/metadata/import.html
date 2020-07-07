@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid mt-3">
+    <form method="post" action="/admin/tguser/importMetadata">
+        <div class="card mt-2">
+            <div class="card-header">
+                Импорт метаданных
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="phones">Телефоны, каждый с новой строки</label>
+                        <textarea name="phones" th:text="${phones}" id="phones" rows="10" class="form-control form-control-sm" style="resize: vertical"></textarea>
+                    </div>
+
+                    <div class="col-6">
+                        <label for="metadata">Метаданные, каждый - с новой строки</label>
+                        <textarea name="metadata" th:text="${metadata}" id="metadata" rows="10" class="form-control form-control-sm" style="resize: vertical"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-outline-primary import-button">
+                    <i class="fa fa-upload"></i> Начать импорт
+                </button>
+            </div>
+        </div>
+
+        <div class="card mt-4" th:if="${importMetadataResult}">
+            <div class="card-header" style="background-color: darkgray">
+                Результаты импорта (уникальных пользователей, шт. -
+                <span th:text="${importMetadataResult.uniqueCount}" class="badge badge-success"></span>
+                дубликатов, шт. - <span th:text="${importMetadataResult.duplicateCount}" class="badge badge-warning"></span> )
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <!-- Updated -->
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="updated" th:text="'Обновлено, шт: ' + ${importMetadataResult.updated.size()}"></label>
+                            <textarea id="updated" th:text="${importMetadataResult.getUpdatedAsString()}" class="form-control form-control-sm" rows="10"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Ignored -->
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="ignored" th:text="'Такое поле уже есть, шт: ' + ${importMetadataResult.ignored.size()}"></label>
+                            <textarea id="ignored" th:text="${importMetadataResult.getIgnoredAsString()}" class="form-control form-control-sm" rows="10"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Not found -->
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="not-found" th:text="'Пользователь не найден, шт: ' + ${importMetadataResult.notFound.size()}"></label>
+                            <textarea id="not-found" th:text="${importMetadataResult.getNotFoundAsString()}" class="form-control form-control-sm" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $('.import-button').click((e) => {
+        bootbox.dialog({message: 'Импортируем данные...', closeButton: false});
+    });
+</script>
+</body>
+</html>

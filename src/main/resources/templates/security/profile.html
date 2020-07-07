@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<div class="container mt-3">
+    <form action="/profile" method="post" autocomplete="off">
+
+    <div class="card">
+        <div class="card-header">Настройки</div>
+
+        <div class="card-body">
+            <h3 class="card-title">Профиль</h3>
+
+            <div class="form-group">
+                <label for="firstName">Имя</label>
+                <input th:value="${user.name}" type="text" name="firstName" id="firstName" class="form-control form-control-sm"/>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Фамилия</label>
+                <input th:value="${user.lastName}" type="text" name="lastName" id="lastName" class="form-control form-control-sm"/>
+            </div>
+
+            <div class="form-group">
+                <label>Пароль (оставьте пустым, если не хотите менять)</label>
+                <input autocomplete="off" type="password" class="form-control form-control-sm" name="password" placeholder="Оставьте пустым, если не хотите менять"/>
+            </div>
+
+            <div class="form-group">
+                <label>API key
+                    <div class="btn btn-sm btn-outline-primary api-key-generate-button">Сгенерировать API key</div>
+                    <a class="btn btn-sm btn-outline-primary" href="/api/v1/help" target="_blank">Документация по API</a>
+                </label>
+                <input th:value="${apiKey}" type="text" class="form-control form-control-sm api-key-textfield" readonly="true" name="apiKey" placeholder="API key"/>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary float-right">
+                <span class="fa fa-save"></span> Сохранить изменения
+            </button>
+        </div>
+    </div>
+    </form>
+</div>
+
+<script>
+    $('.api-key-generate-button').click(function(e) {
+        $('.api-key-textfield').val(generateUUID());
+    });
+
+    function generateUUID() {
+        var d = new Date().getTime();
+
+        if (window.performance && typeof window.performance.now === "function") {
+            d += performance.now();
+        }
+
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = (d + Math.random() * 16) % 16 | 0;
+            d = Math.floor(d / 16);
+            return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+
+        return uuid;
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <span th:text="'Подписчики Leeloo.ai: ' + ${recordCount} + ' шт.'">Подписчики</span>
+            </div>
+
+            <div class="mt-2 mb-2">
+                <div class="p-2">
+                    <!--Filter form-->
+                    <form class="filter-form" action="/admin/leeloo/leelooSubscribesList" method="get">
+                        <input type="hidden" name="currentPage" th:value="${currentPage}" class="current-page"/>
+                        <div class="form-group">
+                            <label for="query">Поиск по номеру телефона</label>
+                            <input type="text" name="query" class="form-control form-control-sm" id="query" th:value="${query}" placeholder="Введите текст для поиска...">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="p-2">
+                <a href="/admin/leeloo/updateMarathonDatesForAll"
+                   class="btn btn-outline-primary btn-sm"
+                    title="Обновить даты марафона для всех, у кого эти даты необновленные">
+                    Обновить даты марафона
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Телефон</th>
+                            <th>Дата старта</th>
+                            <th>День</th>
+                            <th>Прогресс</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="s: ${subscribes}" th:with="sData=${relatedUserData.get(s.accountId)}">
+                            <td th:text="${s.accountId}"></td>
+                            <td th:text="${s.accountName}"></td>
+                            <td th:text="${s.phone}"></td>
+                            <td th:text="${s.getFormattedMarathonStart()}"></td>
+                            <td th:text="${sData.marathonDay}"></td>
+                            <td>
+                                <span th:each="block: ${sData.userProgress}"
+                                      th:text="${block.key + ' - ' + block.value + '%'}"
+                                      class="badge mr-1"
+                                      th:classappend="${(block.value==100) ? 'badge-success' : (block.value == 0 ? 'badge-light' : 'badge-info')}"></span>
+                            </td>
+                            <td>
+                                <div th:attr="aid=${s.accountId}" class="btn btn-sm btn-outline-primary show-direct-links-button">
+                                    <i class="fa fa-list"></i> Показать ссылки
+                                </div>
+
+                                <div th:attr="aid=${s.accountId}" class="btn btn-sm btn-outline-primary write-message-button">
+                                    <i class="fa fa-pencil"></i> Написать сообщение
+                                </div>
+
+                                <a class="btn btn-sm btn-outline-secondary" th:href="${'/admin/leeloo/updateSubscribe?accountId=' + s.accountId}" title="Обновить дату старта">
+                                    <i class="fa fa-refresh"></i>
+                                </a>
+
+                                <a class="btn btn-sm btn-outline-secondary" th:href="${'/admin/leeloo/sendDailyMessageForSubscriber?accountId=' + s.accountId}" title="Отослать ежедневное сообщение">
+                                    Send DM
+                                </a>
+
+                                <div title="Удалить пользователя" th:attr="aid=${s.accountId}" class="btn btn-sm btn-outline-danger delete-subscribe-button">
+                                    <i class="fa fa-trash"></i>
+                                </div>
+
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+                <!--Pagination-->
+                <div th:if="${pageCount > 1}" class="row mt-2">
+                    <div class="col-12">
+                        <div th:style="'display:' + (${currentPage > minPage} ? 'inline-block' : 'none')" class="btn btn-sm btn-outline-secondary pagination-prev-button">&lt;&lt; Предыдущая страница</div>
+                        <span th:text="'Страница ' + ${currentPage + 1} + ' из ' + ${pageCount}">Страница 1 из 5</span>
+                        <div th:if="${currentPage &lt; maxPage}" class="btn btn-sm btn-outline-secondary pagination-next-button">Следующая страница &gt;&gt;</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+</div>
+
+<style>
+    div.bootbox,
+    div.modal-body,
+    div.modal-dialog,
+    div.modal-content {
+        width: 95vw !important;
+    }
+</style>
+<script>
+    $('.delete-subscribe-button').click(function(e) {
+        var accountId = $(e.target).attr('aid');
+        //Show wait screen
+        bootbox.dialog({message: 'Удаляем подписчика...', closeButton: false});
+
+        $('.filter-form').submit();
+
+        $.get( '/admin/leeloo/deleteById', {accountId: accountId}, function( data ) {
+            //Reload page
+            location.reload();
+        });
+    });
+
+    $('.write-message-button').click(function(e) {
+        var accountId = $(e.target).attr('aid');
+
+        bootbox.prompt({
+            title: "Введите сообщение",
+            inputType: 'textarea',
+            callback: function (result) {
+                if (result !== null && result !== '') {
+
+                    var url = '/admin/leeloo/sendMessage';
+
+                    $.post( url, {accountId: accountId, message: result}, function( data ) {
+                        bootbox.hideAll();
+                        setTimeout(function() {
+                            bootbox.dialog({message: 'Сообщение отправлено...', closeButton: false});
+                            setTimeout(function () {
+                                bootbox.hideAll();
+                            }, 1000);
+                        }, 1000);
+                    });
+                }
+            }
+        });
+    });
+
+    $('#query').keypress(function(e) {
+        if(e.which == 13) {
+            bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+            $('.filter-form').submit();
+        }
+    });
+
+    //Pagination
+    $('.pagination-next-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage + 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+
+        form.submit();
+    });
+
+    $('.pagination-prev-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage - 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+        form.submit();
+    });
+
+    $('.show-direct-links-button').click(function(e) {
+        const accountId = $(e.target).attr('aid');
+        const url =  '/admin/leeloo/getDirectLinks';
+
+        $.post( url, {accountId: accountId}, function( data ) {
+            bootbox.alert({message: data, size: 'large'});
+        });
+    });
+</script>
+</body>
+</html>

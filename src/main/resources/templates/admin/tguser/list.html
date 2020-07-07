@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<style>
+    .block-link-button:hover {
+        cursor: pointer;
+        background: lightcoral;
+    }
+
+    .unseen-checkbox-group,
+    .user-tags-group{
+        display: flex;
+        align-items: center;
+    }
+
+    .user-tags-group > label {
+        margin: 0;
+        padding: 2px;
+        margin-right: 15px;
+    }
+
+    .unseen-checkbox-group > label,
+    .unseen-checkbox-group > input{
+        margin: 0;
+        padding: 2px;
+    }
+
+    .unseen-checkbox-group > input {
+        margin-right: 5px;
+    }
+
+    .user-blocked-bot {
+        background-color: #ffdddd;
+    }
+</style>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card mt-2">
+                <div class="card-header">
+                    Пользователи - <span th:text="${recordCount}"></span> шт.
+
+                    <a href="/admin/tguser/importMetadata" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fa fa-plus"></i> Импортировать метаданные
+                    </a>
+                </div>
+                <div class="card-body">
+
+                    <div class="pb-3">
+                        <!--Filter form-->
+                        <form class="filter-form" action="/admin/tguser/list" method="get">
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="unseen-checkbox-group">
+                                        <input type="checkbox" class="with-unseen-messages-checkbox" name="withUnseenMessagesOnly" th:checked="${withUnseenMessagesOnly}" id="withUnseenMessagesOnly">
+                                        <label for="withUnseenMessagesOnly">Только с непрочитанными сообщениями</label>
+                                    </div>
+
+                                    <div class="unseen-checkbox-group">
+                                        <input type="checkbox" class="only-who-blocked-bot-checkbox" name="onlyWhoBlockedBot" th:checked="${onlyWhoBlockedBot}" id="onlyWhoBlockedBot">
+                                        <label for="onlyWhoBlockedBot">Только заблокировавшие бота</label>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="user-tags-group">
+                                        <label for="userTag">Тег:</label>
+                                        <select class="form-control form-control-sm user-tag-selector" name="userTag" id="userTag">
+                                            <option value="">Любой</option>
+                                            <option th:each="tag: ${userTags}"
+                                            th:value="${tag}" th:text="${tag}" th:attr="selected=(${tag == userTag} ? 'true' : 'false')">
+                                                Тег
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <input type="hidden" name="currentPage" th:value="${currentPage}" class="current-page"/>
+                                    <input type="text" name="query" th:value="${query}" placeholder="Введите имя, телефон, тег или email для поиска" class="form form-control form-control-sm query-input">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Никнейм</th> <!--userName -->
+                                <th>ФИО</th> <!-- getFullName() -->
+                                <th>Телефон</th> <!-- phone -->
+                                <th>Email</th> <!-- email -->
+                                <th>Дата</th> <!-- eventDate-->
+                                <th>Тег</th> <!-- Tag -->
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="user: ${users}" th:with="userBlockedBot=${usersThatBlockedBot.contains(user.userId)}" th:classappend="${userBlockedBot ? 'user-blocked-bot' : ''}">
+                                <!--User name and block status -->
+                                <td>
+                                    <i th:if="${userBlockedBot}" class="fa fa-ban text-danger" title="Пользователь заблокировал бота"></i>
+                                    <a th:text="'@' + ${user.userName}" th:href="'https://t.me/' + ${user.userName}" target="_blank"></a>
+                                </td>
+
+                                <td th:text="${user.getFullName()}"></td>
+                                <td> <a th:text="${user.getPhone() == null ? '' : user.getPhone()}" th:href="'tel:' + ${user.getPhone()}"></a></td>
+                                <td th:text="${user.email}"></td>
+                                <td th:text="${user.eventDate}"></td>
+                                <td th:title="${user.payload}" th:text="${user.tag}"></td>
+
+                                <td th:with="unseenMsgCount=${unseenMessageCount.get(user.userId)}">
+                                    <a class="btn btn-sm btn-primary" th:href="'/admin/tguser/im?telegramUserId=' + ${user.userId}">
+                                        <i class="fa fa-eye"></i> Переписка <span th:if="${unseenMsgCount != 0}" th:text="${unseenMsgCount}" class="badge badge-danger badge-pill"></span>
+                                    </a>
+
+                                    <a class="btn btn-sm btn-outline-primary" th:href="'/admin/tguser/create-update?userId=' + ${user.userId}">
+                                        <i class="fa fa-edit"></i> Редактировать
+                                    </a>
+
+                                    <a class="btn btn-sm btn-outline-danger" th:href="'/admin/tguser/delete?userId=' + ${user.userId}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!--Pagination-->
+                    <div th:if="${pageCount > 1}" class="row mt-2">
+                        <div class="col-12">
+                            <div th:style="'display:' + (${currentPage > minPage} ? 'inline-block' : 'none')" class="btn btn-sm btn-outline-secondary pagination-prev-button">&lt;&lt; Предыдущая страница</div>
+                            <span th:text="'Страница ' + ${currentPage + 1} + ' из ' + ${pageCount}">Страница 1 из 5</span>
+                            <div th:if="${currentPage &lt; maxPage}" class="btn btn-sm btn-outline-secondary pagination-next-button">Следующая страница &gt;&gt;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Copy link
+    $('.block-link-button').click((e) => {
+        //Get link
+        const blockLink = $(e.target).attr('block-link');
+
+        //Copy to temp textarea
+        const el = document.createElement('textarea');
+        el.value = blockLink;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        //Notify user
+        bootbox.alert("Ссылка скопирована в буфер обмена");
+        setTimeout(() => bootbox.hideAll(), 1000);
+    });
+
+    //Pagination
+    $('.pagination-next-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage + 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+
+        form.submit();
+    });
+
+    $('.pagination-prev-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage - 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+        form.submit();
+    });
+
+    $('.write-message-button').click((e) => {
+        const userId = $(e.target).attr('user-id');
+
+        bootbox.prompt({
+            title: "Введите сообщение",
+            inputType: 'textarea',
+            centerVertical: true,
+            callback: function(message){
+                if (message) {
+                    const url = '/admin/tguser/sendMessage';
+
+                    $.post( url, {userId: userId, message: message}, function( result ) {
+                        bootbox.hideAll();
+
+                        setTimeout(() => {
+                            bootbox.alert("Сообщение отправлено");
+                        }, 1000);
+                    });
+                }
+            }
+        });
+    });
+
+    //Form
+    $('.user-tag-selector').on("change", (e) => {
+        $('.filter-form').submit();
+    });
+
+    $('.with-unseen-messages-checkbox').click((e) => {
+        $('.filter-form').submit();
+    });
+
+    $('.only-who-blocked-bot-checkbox').click((e) => {
+        $('.filter-form').submit();
+    })
+</script>
+
+</body>
+</html>

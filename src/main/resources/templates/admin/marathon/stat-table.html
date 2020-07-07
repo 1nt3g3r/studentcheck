@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<style>
+    body {
+        background: grey;
+    }
+
+    .table-header {
+        background: lightgray;
+    }
+
+    .hardest-task {
+        background: lightpink;
+    }
+
+    .easisest-task {
+        background: palegreen;
+    }
+
+    .normal-task {
+        background: lightyellow;
+    }
+</style>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid">
+    <!-- User progress -->
+        <div class="card mt-4">
+            <div class="card-header table-header">
+                <span th:text="'Статистика марафона за ' + ${stat.getFormattedStartDate()}  + ' - прогресс пользователей'">Марафоны</span>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-sm table-bordered" th:with="maxTaskCount=17">
+                    <thead>
+                        <tr>
+                            <th style="max-width: 50px;" class="bg-light">День / задача</th>
+                            <th class="bg-light text-center" th:each="taskIndex: ${#numbers.sequence(1, maxTaskCount)}" th:text="${taskIndex}"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    <th:block th:each="dayIndex: ${#numbers.sequence(1, 5)}">
+                        <tr>
+                            <td class="bg-light text-center"><b th:text="${dayIndex}"></b></td>
+                            <th:block th:each="taskIndex: ${#numbers.sequence(1, maxTaskCount)}" th:with="userCount=${stat.getTaskProgress(dayIndex, taskIndex)}">
+
+                                <th:block th:if="${userCount &gt; 0}">
+                                    <td style="background: lightgreen;">
+                                        <span th:text="${stat.getTaskProgressInPercents(dayIndex, taskIndex) + '%'}"></span>
+                                        <span th:text="'(' +${userCount} + ')'" class="small text-black-50"></span>
+                                    </td>
+                                </th:block>
+
+                                <td th:if="${userCount == 0}" style="background: lightpink;">
+                                    <span class="">0%</span>
+                                    <span class="small text-black-50">(0)</span>
+                                </td>
+
+                                <td th:if="${userCount &lt; 0}" class="bg-light"></td>
+
+                            </th:block>
+                        </tr>
+                    </th:block>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    <!-- Single task stats -->
+    <div class="card mt-4">
+        <div class="card-header table-header">
+            <span th:text="'Статистика марафона за ' + ${stat.getFormattedStartDate()} + ' - отдельные задачи'">Марафоны</span>
+        </div>
+
+        <div class="card-body">
+            <p> <span class="easisest-task rounded p-1">Зеленые ячейки</span> - наиболее быстро решаемые задачи.
+                <span class="hardest-task rounded p-1">Красные ячейки</span> - задачи, которые решают дольше всех.
+                <span class="normal-task rounded p-1">Светло-желтые ячейки</span> - задачи, которые решаются не дольше и не быстрее остальных.
+                <span class="rounded p-1">Прочерк (-)</span> - эту задачу еще никто не решал, и статистики по ней нет.</p>
+            <table class="table table-sm table-bordered" th:with="maxTaskCount=17">
+                <thead>
+                <tr>
+                    <th style="max-width: 50px;" class="bg-light">День / задача</th>
+                    <th class="bg-light text-center" th:each="taskIndex: ${#numbers.sequence(1, maxTaskCount)}" th:text="${taskIndex}"></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <th:block th:each="dayIndex: ${#numbers.sequence(1, 5)}">
+                    <tr>
+                        <td class="bg-light text-center"><b th:text="${dayIndex}"></b></td>
+                        <th:block th:each="taskIndex: ${#numbers.sequence(1, maxTaskCount)}" th:with="taskStat=${stat.getTaskStat(dayIndex, taskIndex)}">
+
+                            <th:block th:if="${taskStat}">
+                                <td th:if="${!taskStat.empty}" th:title="${'ID задачи: ' + taskStat.taskId}" th:classappend="${taskStat.hardest ? 'hardest-task' : (taskStat.easiest ? 'easisest-task' : 'normal-task')}">
+                                    <span th:text="${taskStat.getAvgFormattedTime()}"></span>
+                                    <span th:text="'(' + ${taskStat.getAvgTryCount() + ')'}" class="small text-black-50"></span>
+                                    <span th:text="${taskStat.sampleCount}" class="small" style="color: #aaaaaa; float: right;"></span>
+                                </td>
+
+                                <td th:if="${taskStat.empty}">
+                                    <span>-</span>
+                                </td>
+                            </th:block>
+
+                            <td th:if="${taskStat == null}" class="bg-light"></td>
+
+                        </th:block>
+                    </tr>
+                </th:block>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

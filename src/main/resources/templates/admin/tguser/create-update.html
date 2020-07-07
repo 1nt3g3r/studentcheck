@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container mt-3">
+    <form method="post" action="/admin/tguser/create-update">
+        <input type="hidden" name="userId" th:value="${telegramUser.userId}">
+        <div class="card mt-2">
+            <div class="card-header">
+                <span th:text="${telegramUser.userId == -1 ? 'Создание' : 'Редактирование'} + ' пользователя '"></span>
+
+                <span class="font-weight-bold" th:if="${telegramUser.userId != -1}" th:text="${telegramUser.fullName}"></span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <label for="firstName">Имя</label>
+                        <input type="text" name="firstName" id="firstName" th:value="${telegramUser.firstName}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-3">
+                        <label for="lastName">Фамилия</label>
+                        <input type="text" name="lastName" id="lastName" th:value="${telegramUser.lastName}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-3">
+                        <label for="phone">Телефон</label>
+                        <input type="text" name="phone" id="phone" th:value="${telegramUser.phone}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-3">
+                        <label for="email">Email</label>
+                        <input type="text" name="email" id="email" th:value="${telegramUser.email}" class="form-control form-control-sm">
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-3">
+                        <label for="tag">Тег</label>
+                        <input type="text" name="tag" id="tag" th:value="${telegramUser.tag}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-3">
+                        <label for="eventDate">Дата события</label>
+                        <input type="text" name="eventDate" id="eventDate" th:value="${telegramUser.eventDate}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-3">
+                        <label for="languageCode">Язык</label>
+                        <input type="text" name="languageCode" id="languageCode" th:value="${telegramUser.languageCode}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-3">
+                        <label for="role">Роль</label>
+                        <input type="text" name="role" id="role" th:value="${telegramUser.role}" class="form-control form-control-sm">
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label for="metadata">Метаданные (каждый элемент - с новой строки)</label>
+                        <textarea class="form-control form-control-sm" name="metadata" id="metadata" th:text="${telegramUser.metadata}" rows="5"></textarea>
+                    </div>
+                </div>
+                
+                <div class="p-2 bg-light mt-2" th:if="${invitedUsers.size() != 0}">
+                    <div class="row">
+                        <div class="col-12">
+                            <p>Приглашенные пользователи: <span th:text="${invitedUsers.size()}"></span> шт.</p>
+                            <table class="table table-sm mt-2 table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Имя</th>
+                                    <th>Действия</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="invitedUser: ${invitedUsers}">
+                                    <td th:text="${invitedUser.userId}"></td>
+                                    <td th:text="${invitedUser.getFullName()}"></td>
+                                    <td>та
+                                        <a th:href="'/admin/tguser/create-update?userId=' + ${invitedUser.userId}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-2 bg-light mt-2" th:if="${whoInvited}">
+                    <p>Кто пригласил:</p>
+                    <table class="table table-sm mt-2 table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td th:text="${whoInvited.userId}"></td>
+                            <td th:text="${whoInvited.getFullName()}"></td>
+                            <td>
+                                <a th:href="'/admin/tguser/create-update?userId=' + ${whoInvited.userId}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    Открыть
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="payload">Payload (не редактировать, в информационных целях)</label>
+                            <input class="form-control form-control-sm" type="text" disabled th:value="${telegramUser.payload}" id="payload">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerDate">Дата регистрации</label>
+                            <input class="form-control form-control-sm" type="text" disabled th:value="${#temporals.format(telegramUser.registerDate, 'yyyy-MM-dd в HH:mm')}" id="registerDate">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button class="btn btn-primary save-button">
+                    <i class="fa fa-save"></i> Сохранить
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    $('.save-button').click(function(e) {
+        bootbox.dialog({message: 'Сохраняем данные...', closeButton: false});
+    });
+</script>
+</body>
+</html>

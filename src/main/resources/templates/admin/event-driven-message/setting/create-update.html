@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container mt-3">
+    <form method="post" action="/admin/event-driven-message/setting/create-update">
+        <input type="hidden" name="id" th:value="${setting.id}">
+        <div class="card mt-2">
+            <div class="card-header" th:text="${setting.id == -1 ? 'Создание' : 'Редактирование'} + ' переменной'"></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-5">
+                        <div class="form-group">
+                            <label for="name">Имя</label>
+                            <input type="text" name="name" th:value="${setting.name}" id="name"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="tag">Тег</label>
+                            <input type="text" name="tag" th:value="${setting.tag}" id="tag"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-3">
+                        <label for="date">Дата</label>
+                        <input type="text" name="date" th:value="${setting.date}" id="date"
+                               class="form-control form-control-sm">
+                    </div>
+                </div>
+
+                <!--Day event-->
+                <div class="row mt-2 mb-2">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="value">Значение переменной</label>
+                            <textarea name="value" th:text="${setting.value}" id="value" rows="3" class="form-control form-control-sm"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button class="btn btn-primary">
+                    <i class="fa fa-save"></i> Сохранить
+                </button>
+
+                <a class="btn btn-outline-secondary ml-1">
+                    <i class="fa fa-list"></i> Все переменные
+                </a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+</body>
+</html>

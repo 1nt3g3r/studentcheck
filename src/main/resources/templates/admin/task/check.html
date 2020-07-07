@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body style="background: #808080">
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<style>
+    img {
+        max-width: 100%;
+    }
+
+    summary {
+        background: lightgray;
+        padding: 5px;
+    }
+</style>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-6">
+            <div class="card" th:if="${taskCheckResult}">
+                <div class="card-header bg-white">Результаты проверки</div>
+                <div class="card-body">
+                    <div class="p-1 m-2" th:each="condition: ${taskCheckResult.successConditions}">
+                        <i class="fa fa-check" style="color: darkgreen;"></i> <span style="color: darkgreen" th:text="${condition}"></span>
+                    </div>
+
+                    <div class="p-1 m-2" th:each="condition: ${taskCheckResult.failedConditions}">
+                        <i class="fa fa-times" style="color: darkred;"></i> <span style="color: darkred;" th:text="${condition}"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card bg-white mt-4">
+                <div class="card-header bg-light">Условие задачи</div>
+                <div class="card-body" th:utext="${taskData.htmlDescription}">
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="col-6">
+            <form method="post" action="/admin/task/check" class="check-form">
+                <div class="card">
+                <div class="card-header bg-light">Пишите здесь ваше решение</div>
+                <div class="card-body">
+                    <input type="hidden" name="taskId" th:value="${taskId}">
+
+                    <div class="form-group">
+                        <label for="html">HTML</label>
+                        <textarea id="html" name="html" th:text="${html}" class="form-control form-control-sm" rows="5"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="html">CSS</label>
+                        <textarea id="css" name="css" th:text="${css}" class="form-control form-control-sm" rows="5"></textarea>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="btn btn-primary check-button">
+                        <i class="fa fa-check"></i> Проверить</div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.check-button').click(function(e) {
+        bootbox.dialog({message: 'Проверяем код...', closeButton: false});
+        $('.check-form').submit();
+    });
+</script>
+</body>
+</html>

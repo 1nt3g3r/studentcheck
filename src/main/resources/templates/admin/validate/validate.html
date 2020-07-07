@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container">
+    <form method="get" action="/admin/task/validate">
+        <div class="card">
+            <div class="card-header">Валидация задачи</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="taskId">ID задачи</label>
+                    <input type="text" name="taskId" id="taskId" th:value="${taskId}" class="form form-control form-control-sm">
+                </div>
+
+                <button type="submit" class="btn btn-primary save-button">
+                    <i class="fa fa-save"></i> Валидировать
+                </button>
+
+                <div class="mt-2 mb-2" th:if="${validateResult}">
+                    <span class="badge" th:text="${validateResult.result}"></span>
+
+                    <th:block th:if="${validateResult.validLinks.size() == 0}">
+                        <span class="badge badge-success">Нет успешно прошедших проверку ссылок</span>
+                    </th:block>
+
+                    <th:block th:if="${validateResult.validLinks.size() != 0}">
+                        <div class="p-2 mt-2 mb-2 bg-light border rounded">
+                            <h3>Успешно прошедшие проверку ссылки</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" th:each="link: ${validateResult.validLinks}">
+                                    <a class="text-success" th:text="${link}" th:href="${link}"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </th:block>
+
+
+                    <th:block th:if="${validateResult.invalidLinks.size() == 0}">
+                        <span class="badge badge-success">Нет битых ссылок</span>
+                    </th:block>
+
+                    <th:block th:if="${validateResult.invalidLinks.size() != 0}">
+                        <div class="p-2 mt-2 mb-2 bg-light border rounded">
+                            <h3>Битые ссылки</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" th:each="link: ${validateResult.invalidLinks}">
+                                    <a class="text-danger" th:text="${link}" th:href="${link}"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $('.save-button').click(function(e) {
+        bootbox.dialog({message: 'Проверяем задачу...', closeButton: false});
+    });
+</script>
+
+</body>
+</html>

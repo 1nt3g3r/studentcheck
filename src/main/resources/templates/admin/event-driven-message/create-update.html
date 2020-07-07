@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<style>
+    .keyboard-type label {
+        width: 25%;
+    }
+
+    .keyboard-type input {
+        max-width: 70%;
+    }
+</style>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container mt-3">
+    <form method="post" action="/admin/event-driven-message/create-update">
+        <input type="hidden" name="id" th:value="${msg.id}">
+        <div class="card mt-2">
+            <div class="card-header" th:text="${msg.id == -1 ? 'Создание' : 'Редактирование'} + ' сообщения'"></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-5">
+                        <div class="form-group">
+                            <label for="title">Заголовок</label>
+                            <input type="text" name="title" th:value="${msg.title}" id="title"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label for="tag">Тег</label>
+                            <input type="text" name="tag" th:value="${msg.tag}" id="tag"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-3">
+                        <label for="event">Событие отправки</label>
+                        <select id="event" name="event" class="form-control form-control-sm event-selector">
+                            <option th:each="e: ${events}" th:value="${e}" th:text="${e.description}" th:selected="${e == msg.event}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label for="priority">Приоритет</label>
+                            <input type="number" step="1" name="priority" th:value="${msg.priority}" id="priority"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!--Day event-->
+                <div class="row mt-2 mb-2 event-scheduled-time">
+                    <div class="col-4 concrete-date-form-group">
+                        <div class="form-group">
+                            <label for="day">Дата (yyyy-mm-dd)</label>
+                            <input type="text" name="concreteDate" th:value="${msg.concreteDate}" id="concreteDate"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-4 day-form-group">
+                        <div class="form-group">
+                            <label for="day">День</label>
+                            <input type="number" step="1" name="day" th:value="${msg.day}" id="day"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="hour">Час (0-24)</label>
+                            <input type="number" step="1" min="0" max="24" name="hour" th:value="${msg.hour}" id="hour"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="minute">Минута (0-59)</label>
+                            <input type="number" step="5" min="0" max="55" name="minute" th:value="${msg.minute}" id="minute"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- userWroteMessagePattern -->
+                <div class="row mt-2 mb-2 event-user-wrote-message">
+                    <div class="col-12">
+                        <label for="userWroteMessagePattern">Образец сообщения пользователя</label>
+                        <input type="text" name="userWroteMessagePattern" id="userWroteMessagePattern" th:value="${msg.userWroteMessagePattern}" class="form-control form-control-sm">
+                    </div>
+                </div>
+
+                <!-- userWroteMessagePattern -->
+                <div class="row mt-2 mb-2 event-user-press-button">
+                    <div class="col-12">
+                        <label for="userButtonPayload">Payload нажатой кнопки</label>
+                        <input type="text" name="userButtonPayload" id="userButtonPayload" th:value="${msg.userButtonPayload}" class="form-control form-control-sm">
+                    </div>
+                </div>
+
+                <!--Text-->
+                <div class="form-group mt-2">
+                    <label for="text">Текст сообщения</label>
+                    <textarea name="text" th:text="${msg.text}" id="text"
+                              class="form-control form-control-sm"
+                              rows="20"></textarea>
+                </div>
+
+                <div class="mt-2">
+                    <details>
+                        <summary>Дополнительные возможности</summary>
+                        <div>
+                            <div style="display: flex;" class="mb-2 mt-2 keyboard-type">
+                                <label for="keyboardType">Тип клавиатуры</label>
+                                <select class="form-control form-control-sm" name="keyboardType" id="keyboardType">
+                                    <option th:each="kbdType: ${keyboardTypes}"
+                                            th:text="${kbdType.description}"
+                                            th:value="${kbdType.name()}"
+                                            th:selected="${msg.keyboardType == kbdType}">
+
+                                    </option>
+                                </select>
+                            </div>
+                            <label for="inlineKeyboard">Клавиатура</label>
+                            <textarea name="inlineKeyboard" th:text="${msg.inlineKeyboard}" id="inlineKeyboard" class="form-control form-control-sm" rows="3"></textarea>
+                        </div>
+                    </details>
+
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button class="btn btn-primary">
+                    <i class="fa fa-save"></i> Сохранить
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    $('.event-selector').on('change', (e) => {
+      updateEventSelector(e);
+    });
+
+    function updateEventSelector(e) {
+        const event = $("option:selected").val();
+        if (event === 'newUserSubscribed' || event === 'dailyNotifyHour') {
+            $('.event-scheduled-time').css('display', 'none');
+            $('.event-user-wrote-message').css('display', 'none');
+            $('.event-user-press-button').css('display', 'none');
+        } else if (event === 'scheduledTime' || event === 'concreteDate') {
+            $('.event-scheduled-time').css('display', 'flex');
+            $('.event-user-wrote-message').css('display', 'none');
+            $('.event-user-press-button').css('display', 'none');
+
+            $('.concrete-date-form-group').css('display', event === 'concreteDate' ? 'flex' : 'none');
+            $('.day-form-group').css('display', event === 'scheduledTime' ? 'flex' : 'none');
+        } else if (event === 'userWrote') {
+            $('.event-scheduled-time').css('display', 'none');
+            $('.event-user-press-button').css('display', 'none');
+            $('.event-user-wrote-message').css('display', 'flex');
+        } else if (event === 'userPressInlineButton') {
+            $('.event-scheduled-time').css('display', 'none');
+            $('.event-user-press-button').css('display', 'flex');
+            $('.event-user-wrote-message').css('display', 'none');
+        }
+    }
+
+    updateEventSelector($(".event-selector"));
+</script>
+
+</body>
+</html>

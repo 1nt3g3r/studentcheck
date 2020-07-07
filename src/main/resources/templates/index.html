@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid mt-2 p-3" th:if="${user}">
+    <div class="row">
+        <!-- Admin menu -->
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">Администрирование</div>
+
+                <div class="card-body">
+                    <a href="/admin/tguser/list" class="btn btn-primary btn-block">
+                        <i class="fa fa-user"></i> Телеграм пользователи
+                    </a>
+
+                    <a href="/admin/event-driven-message/list" class="btn btn-outline-primary btn-block">
+                        <i class="fa fa-pencil"></i> Сообщения
+                    </a>
+
+                    <a href="/admin/tguser/stat" class="btn btn-outline-secondary btn-block">
+                        <i class="fa fa-list"></i> Отчеты
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!--Service menu-->
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">Служебные функции</div>
+
+                <div class="card-body">
+                    <a href="/admin/task/requestStat" class="btn btn-outline-secondary btn-block">
+                        <i class="fa fa-cog"></i> Статистика по нагрузке
+                    </a>
+
+                    <a href="/admin/bgtask/list" class="btn btn-outline-secondary btn-block">
+                        <i class="fa fa-tasks"></i> Фоновые задачи
+                    </a>
+
+                    <a href="/admin/remotecheckservers/settings" class="btn btn-outline-secondary btn-block">
+                        <i class="fa fa-server"></i> Сервера автопроверки
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

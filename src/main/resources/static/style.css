@@ -1,0 +1,55 @@
+body {
+    background: #fafafa;
+    padding-bottom: 30px;
+}
+
+#sticky-sidebar {
+    height: 100vh;
+    background: lightgray;
+}
+
+.sidebar-link {
+    display: block;
+    height: 40px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: middle;
+    line-height: 25px;
+    padding: 5px;
+    padding-left: 15px;
+    color: blue;
+}
+
+.sidebar-link:hover {
+    background: white;
+    text-decoration: none;
+}
+
+.rule-actions {
+    padding-top: 3px;
+}
+
+.rules-group-container {
+    margin-bottom: 6px;
+}
+
+#builder_group_0 {
+    width: 100%;
+}
+
+.rules-group-header .btn-primary:not(.active) {
+    background: lightgray !important;
+}
+
+.save-button:hover, .delete-button:hover {
+    cursor: pointer;
+}
+
+#main {
+    padding-top: 16px;
+}
+
+.fa {
+    pointer-events: none;
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card mt-2">
+                <div class="card-header">Отдельные сообщения - <span th:text="${recordCount}"></span> шт.
+                    <a class="btn btn-sm btn-primary" href="/admin/event-driven-message/create-update">
+                        <i class="fa fa-plus"></i> Создать сообщение
+                    </a>
+                </div>
+                <div class="card-body">
+
+                    <div class="pb-3">
+                        <!--Filter form-->
+                        <form class="filter-form" action="/admin/event-driven-message/list" method="get">
+                            <input type="hidden" name="currentPage" th:value="${currentPage}" class="current-page"/>
+                            <input type="text" name="query" th:value="${query}" placeholder="Введите заголовок или текст для поиска" class="form form-control form-control-sm query-input">
+                        </form>
+                    </div>
+
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Тег</th>
+                                <th>Title</th>
+                                <th>Условие рассылки</th>
+                                <th>Текст</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="msg: ${messages}">
+                                <td th:text="${msg.tag}"></td>
+                                <td th:text="${msg.title}"></td>
+                                <td th:text="${msg.humanReadableDescription}"></td>
+                                <td th:text="${msg.getExcerpt()}"></td>
+
+                                <td>
+
+                                    <div class="btn-group dropleft">
+                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Действия
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item bg-primary" th:href="'/admin/event-driven-message/create-update?id=' + ${msg.id}" title="Редактировать">
+                                                <i class="fa fa-edit"></i> Редактировать
+                                            </a>
+
+                                            <a class="dropdown-item" th:href="'/admin/event-driven-message/copy?id=' + ${msg.id}" title="Копировать">
+                                                <i class="fa fa-copy"></i> Сделать копию
+                                            </a>
+
+                                            <button th:attr="message-id=${msg.id}" type="button" class="dropdown-item send-message-to-user-button">
+                                                <i class="fa fa-mail-reply"></i> Отослать пользователю
+                                            </button>
+
+                                            <a class="dropdown-item bg-danger" th:href="'/admin/event-driven-message/delete?id=' + ${msg.id}" title="Удалить">
+                                                <i class="fa fa-trash"></i> Удалить
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!--Pagination-->
+                    <div th:if="${pageCount > 1}" class="row mt-2">
+                        <div class="col-12">
+                            <div th:style="'display:' + (${currentPage > minPage} ? 'inline-block' : 'none')" class="btn btn-sm btn-outline-secondary pagination-prev-button">&lt;&lt; Предыдущая страница</div>
+                            <span th:text="'Страница ' + ${currentPage + 1} + ' из ' + ${pageCount}">Страница 1 из 5</span>
+                            <div th:if="${currentPage &lt; maxPage}" class="btn btn-sm btn-outline-secondary pagination-next-button">Следующая страница &gt;&gt;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Pagination
+    $('.pagination-next-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage + 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+
+        form.submit();
+    });
+
+    $('.pagination-prev-button').click(function(e) {
+        var form = $('.filter-form');
+        var currentPage = parseInt(form.find('.current-page').val());
+        form.find('.current-page').val(currentPage - 1);
+
+        //Show wait screen
+        bootbox.dialog({message: 'Загружаем данные...', closeButton: false});
+        form.submit();
+    });
+
+    $('.query-input').on((e) => {
+        $('.filter-form').submit();
+        //
+    });
+
+    $('.send-message-to-user-button').click(function(e) {
+       const messageId = $(e.target).attr('message-id');
+
+        bootbox.prompt("Введите номер телефона пользователя", function(phone){
+            if (phone) {
+                $.post("/admin/event-driven-message/sendToUser", {messageId: messageId, phone: phone})
+                    .done(function (data) {
+                        alert(data);
+                    });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header::head"></head>
+<body>
+
+<!--TOP MENU-->
+<th:block th:replace="fragments/header::top-menu"></th:block>
+
+<div class="container-fluid">
+        <div class="card">
+            <div class="card-header" th:text="'Фоновые задачи: ' + ${tasks.size()} + 'шт.'">Задачи</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Описание</th>
+                        <th>Попыток</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="task : ${tasks}">
+                            <td th:text="${task.description}"></td>
+                            <td th:text="${task.tryCount}"></td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-danger" href="#">
+                                    <i class="fa fa-trash"></i> Отменить
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+</div>
+
+<script>
+    $('.clear-button').click(function(e) {
+        bootbox.dialog({message: 'Очищаем ошибки...', closeButton: false});
+    });
+</script>
+
+</body>
+</html>
