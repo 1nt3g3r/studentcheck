@@ -38,106 +38,8 @@ public class CheckTaskBlockService {
     public void init() {
         blockMap = new LinkedHashMap<>();
 
-        blockMap.put(0, Arrays.asList("html-1", "html-2", "html-3", "html-4", "html-5", "html-6", "html-7", "html-8", "html-9", "html-10",
-                "html-11", "html-12", "html-13", "html-14", "html-15",
-                "css-1", "css-2", "css-3", "css-4", "css-5", "css-6", "css-7", "css-8", "css-9", "css-10", "css-11", "css-12", "css-13", "css-14", "css-15", "css-16", "css-17",
-                "css-18", "css-19", "css-20", "css-21", "css-22", "css-23", "css-24", "css-25", "css-26", "css-27", "css-28", "css-29"));
-        blockMap.put(1, Arrays.asList("html-1", "html-2", "html-3", "html-4", "html-5", "html-6", "html-7", "html-8", "html-9", "html-10"));
-        blockMap.put(2, Arrays.asList("html-11", "html-12", "html-13", "html-14", "html-15"));
-        blockMap.put(3, Arrays.asList("css-1", "css-2", "css-3", "css-4", "css-5", "css-6", "css-7", "css-8", "css-9", "css-10", "css-11", "css-12", "css-13", "css-14", "css-15", "css-16", "css-17"));
-        blockMap.put(4, Arrays.asList("css-18", "css-19", "css-20", "css-21", "css-22", "css-23", "css-24", "css-25", "css-26", "css-27", "css-28", "css-29"));
-        blockMap.put(5, Arrays.asList("css-netlify"));
-        blockMap.put(6, Arrays.asList("css-30", "css-31", "css-32", "css-33", "css-34", "css-35", "css-36"));
-
-        //JS
-        blockMap.put(7, Arrays.asList(
-                "html-teens-1",
-                "css-teens-2",
-                "js-teens-3",
-                "html-teens-4",
-                "css-teens-5",
-                "js-teens-6",
-                "html-teens-7",
-                "css-teens-8",
-                "js-teens-9",
-                "html-teens-10",
-                "css-teens-11",
-                "js-teens-12",
-                "html-teens-13",
-                "css-teens-14",
-                "js-teens-15",
-                "html-teens-16",
-                "css-teens-17",
-                "js-teens-18",
-                "html-teens-19",
-                "css-teens-20",
-                "js-teens-21",
-                "html-teens-22",
-                "css-teens-23",
-                "js-teens-24",
-                "html-teens-25",
-                "css-teens-26",
-                "js-teens-27",
-                "css-teens-28",
-                "css-teens-29",
-                "js-teens-30",
-                "html-teens-31",
-                "css-teens-32",
-                "js-teens-33",
-                "js-teens-34",
-                "js-teens-35",
-                "html-teens-36"));
-
-        //Teen 33 - HTML&CSS&JS
-        String[][] teen33Blocks =  {
-                {  "html-teens-1", "css-teens-2", "js-teens-3", "html-teens-4", "css-teens-5", "js-teens-6", "html-teens-7", "css-teens-8", "js-teens-9", "html-teens-10", "css-teens-11", "js-teens-12"},
-                { "html-teens-13", "css-teens-14", "js-teens-15", "html-teens-16", "css-teens-17", "js-teens-18", "html-teens-19", "css-teens-20", "js-teens-21", "html-teens-22", "css-teens-23", "js-teens-24"},
-                { "html-teens-25", "css-teens-26", "js-teens-27", "css-teens-28", "css-teens-29", "js-teens-30", "html-teens-31", "css-teens-32", "js-teens-33", "js-teens-34", "js-teens-35", "html-teens-36"}
-        };
-
-        int startTeenBlockIndex = 8;
-        for(int i = 0; i < 3; i++) {
-            int teenBlockIndex = startTeenBlockIndex + i;
-            blockMap.put(teenBlockIndex, Arrays.asList(teen33Blocks[i]));
-        }
-
-        //Teen 33 - Java
-        blockMap.put(11, Arrays.asList(
-                "java-teens-methods",
-                "java-teens-method-declaration",
-                "java-teens-enter-name",
-                "java-teens-string-concat",
-                "java-teens-division",
-                "java-teens-system-out",
-                "java-teens-class",
-                "java-teens-class-2",
-                "java-teens-class-3",
-                "java-teens-scanner"
-        ));
-        blockMap.put(12, Arrays.asList(
-                "java-teens-map-1",
-                "java-teens-map-2",
-                "java-teens-map-profession",
-                "java-teens-init-dreams-method",
-                "java-teens-process-1",
-                "java-teens-to-lower-case",
-                "java-teens-boolean",
-                "java-teens-process-is-hello",
-                "java-teens-compare-numbers",
-                "java-teens-if-else"
-        ));
-        blockMap.put(13, Arrays.asList(
-                "java-teens-process-2",
-                "java-teens-array",
-                "java-teens-iterate-map-keys",
-                "java-teens-find-1",
-                "java-teens-process-3",
-                "java-teens-process-4",
-                "java-teens-calculate-month-count",
-                "java-teens-validate-month-count",
-                "java-teens-calculate-month-count-2",
-                "java-teens-final"
-        ));
+        //Module 1
+        blockMap.put(1, Arrays.asList("js-hw-1-1", "js-hw-1-2", "js-hw-1-3", "js-hw-1-4", "js-hw-1-5"));
 
         //Generate hashes for blocks
         blockIndexHashes = new LinkedHashMap<>();
@@ -165,7 +67,7 @@ public class CheckTaskBlockService {
             return;
         }
 
-        int startIndex = 100;
+        int startIndex = 1000;
         int maxIndex = startIndex + 10000;
         for(int freeIndex = startIndex; freeIndex < maxIndex; freeIndex++) {
             if (!singleTaskBlockMap.containsKey(freeIndex)) {

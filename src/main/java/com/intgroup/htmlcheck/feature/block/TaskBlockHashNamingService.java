@@ -11,12 +11,10 @@ import java.util.Map;
 @Service
 public class TaskBlockHashNamingService {
     private List<Character> chars;
-    private Map<Integer, String> legacyHashes;
 
     @PostConstruct
     public void init() {
         initCharacterMap();
-        fillLegacyHashes();
     }
 
     private void initCharacterMap() {
@@ -41,23 +39,7 @@ public class TaskBlockHashNamingService {
         }
     }
 
-    private void fillLegacyHashes() {
-        legacyHashes = new LinkedHashMap<>();
-        legacyHashes.put(0, "645hg4y7");
-        legacyHashes.put(1, "juf31geq");
-        legacyHashes.put(2, "74gfhj7l");
-        legacyHashes.put(3, "jgfhk855");
-        legacyHashes.put(4, "f5368942");
-        legacyHashes.put(5, "fsa64rij");
-        legacyHashes.put(6, "546jh547");
-        legacyHashes.put(7, "54he6yju");
-    }
-
     public String getUniqueBlockHash(int number) {
-        if (legacyHashes.containsKey(number)) {
-            return legacyHashes.get(number);
-        }
-
         StringBuilder result = new StringBuilder();
         for(int i = 0; i < 7; i++) {
             int charPosition = (number + i) % chars.size();
