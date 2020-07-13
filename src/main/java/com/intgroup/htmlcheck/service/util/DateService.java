@@ -33,4 +33,10 @@ public class DateService {
 
         return LocalDateTime.of(year, month, dayOfMonth, hour, minute, second);
     }
+    
+    public LocalDateTime parseFromDateString(String dateString) {
+        String[] parts = dateString.split("-");
+        
+        return LocalDateTime.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), 0, 0);
+    }
 }

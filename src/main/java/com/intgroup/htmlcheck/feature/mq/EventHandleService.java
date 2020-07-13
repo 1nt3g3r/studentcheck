@@ -10,6 +10,7 @@ import com.intgroup.htmlcheck.feature.telegram.domain.TelegramUser;
 import com.intgroup.htmlcheck.feature.telegram.service.TelegramBotService;
 import com.intgroup.htmlcheck.feature.telegram.service.TelegramUserService;
 import com.intgroup.htmlcheck.feature.telegram.service.payload.TelegramMessagePayload;
+import com.intgroup.htmlcheck.service.util.DateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,9 @@ public class EventHandleService {
 
     @Autowired
     private SettingService settingService;
+    
+    @Autowired
+    private DateService dateService;
     
     public void eventHappened(Event event, Object ... keyValues) {
         Map<String, Object> data = new HashMap<>();
@@ -121,6 +125,20 @@ public class EventHandleService {
                     } else {
                         Duration duration = Duration.between(totalRegisterTime, LocalDateTime.now());
                         data.put("userTotalRegisterTimeInHours", duration.toHours());
+                    }
+                    
+                    //Calculate total time from event date
+                    String eventDateString = telegramUser.getEventDate();
+                    if (eventDateString == null || eventDateString.isBlank()) {
+                        data.put("userTotalTimeFromEventDateInHours", -1);
+                    } else {
+                        try {
+                            LocalDateTime eventDate = dateService.parseFromDateString(eventDateString);
+                            Duration duration = Duration.between(eventDate, LocalDateTime.now());
+                            data.put("userTotalTimeFromEventDateInHours", duration.toHours());
+                        } catch (Exception ex) {
+                            data.put("userTotalTimeFromEventDateInHours", -1);
+                        }
                     }
                 }
 
