@@ -63,11 +63,13 @@ public class RemoteServerCacheFilesService {
             urls.add(src);
         });
 
-        taskData.getMetadata().values().forEach(value -> {
-            if (isRelativeImgPath(value.toString())) {
-                urls.add(value.toString());
-            }
-        });
+        if (taskData.getMetadata() != null) {
+            taskData.getMetadata().values().forEach(value -> {
+                if (isRelativeImgPath(value.toString())) {
+                    urls.add(value.toString());
+                }
+            });
+        }
 
         urls.forEach(src -> {
             if (src.startsWith("./")) {
