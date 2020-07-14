@@ -11,11 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class SimpleCORSFilter implements Filter {
 
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -29,6 +30,7 @@ public class SimpleCORSFilter implements Filter {
 		response.setHeader("Access-Control-Expose-Headers", "User-Cookie");
 
 		if ("OPTIONS".equals(request.getMethod())) {
+			System.out.println("In options");
 			response.setStatus(HttpServletResponse.SC_OK);
 		} else {
 			chain.doFilter(req, response);
