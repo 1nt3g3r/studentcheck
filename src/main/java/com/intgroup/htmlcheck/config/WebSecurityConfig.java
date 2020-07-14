@@ -28,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.addFilterBefore(new SimpleCORSFilter(), UsernamePasswordAuthenticationFilter.class).cors().and().csrf().disable()
+        http.cors().and().csrf().disable()
                 .authorizeRequests()
                      //Landings
                     .antMatchers("/deploy/**").permitAll()
