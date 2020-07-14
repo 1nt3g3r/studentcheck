@@ -4,13 +4,12 @@ import com.intgroup.htmlcheck.controller.api.RequestResult;
 import com.intgroup.htmlcheck.domain.security.User;
 import com.intgroup.htmlcheck.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RequestMapping("/api/v2/analytics")
+@RestController
 public class AnalyticsEventApiController {
     @Autowired
     private UserService userService;
