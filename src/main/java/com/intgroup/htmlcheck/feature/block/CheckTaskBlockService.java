@@ -46,6 +46,9 @@ public class CheckTaskBlockService {
         
         //Module 3
         blockMap.put(3, Arrays.asList("js-hw-3-1", "js-hw-3-2", "js-hw-3-3", "js-hw-3-4", "js-hw-3-5", "js-hw-3-6"));
+        
+        //Module 4
+        blockMap.put(4, Arrays.asList("js-hw-4-1", "js-hw-4-2", "js-hw-4-3", "js-hw-4-4", "js-hw-4-5"));
 
         //Generate hashes for blocks
         blockIndexHashes = new LinkedHashMap<>();
